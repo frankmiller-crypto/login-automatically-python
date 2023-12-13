@@ -4,6 +4,7 @@ from selenium import webdriver
 import time
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
+from tqdm import tqdm
 
 def iniciar_sesion(usuario, contrasena, credenciales_validas):
     try:
@@ -51,12 +52,16 @@ credenciales_validas = []
 
 # Verificar si el archivo CSV existe
 if os.path.isfile(csv_file_path):
+
+    # Obtener el número total de líneas en el archivo CSV
+    total_lines = sum(1 for line in open(csv_file_path))
+
     # Abrir el archivo CSV
     with open(csv_file_path, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
 
-        # Iterar sobre cada línea del archivo CSV
-        for line in csv_reader:
+        # Iterar sobre cada línea del archivo CSV con tqdm
+        for line in tqdm(csv_reader, total=total_lines, desc="Procesando credenciales", unit=" línea"):
             usuario = line[0]
             contrasena = line[1]
 
