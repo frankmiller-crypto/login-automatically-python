@@ -1,5 +1,6 @@
 import os
 import time
+from colorama import Fore
 
 # Función para obtener un número entero del usuario
 def obtener_entero_input(mensaje):
@@ -58,7 +59,7 @@ while opcion != 5:
         """
         print(disney)
         print("Es una herramienta misteriosa que nos ayudará mas tarde")
-        time.sleep(5)
+        time.sleep(3)
         os.system("python scripts/login_disneyplus.py")
     elif opcion == 2:
         bugs_bunny = """
@@ -92,7 +93,7 @@ while opcion != 5:
         """
         print(bugs_bunny)
         print("Que hay de nuevo viejo?")
-        time.sleep(5)
+        time.sleep(3)
         os.system("python scripts/login_hbomax.py")
     elif opcion == 3:
         homero = """
@@ -120,9 +121,9 @@ while opcion != 5:
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡏⠀⠀⠀⢀⣀⣠⠤⠤⠶⠒⠒⠒⠒⢲⡆⠒⠒⠒⠦⣤⣀⡀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀~                                                                                       ~⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢘⡗⠒⠉⠉⠉⠉⠉⠉⠐⠒⠒⠒⠒⠒⠒⠛⠒⠈⠉⠉⠁⠀⠉⢻⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         """
+
         print(homero)
-        print("Babosos")
-        time.sleep(5)
+        time.sleep(3)
         os.system("python scripts/login_starplus.py")
     elif opcion == 4:
         netflix = """
@@ -146,8 +147,7 @@ while opcion != 5:
 ----------------::::::::::::::......::::::::::::::----------------- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         """
         print(netflix)
-        print("Babosos")
-        time.sleep(5)
+        time.sleep(3)
         os.system("python scripts/login_netflix.py")
     elif opcion == 5:
         print("Bye")

